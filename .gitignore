@@ -1,0 +1,8 @@
+.idea
+zig/zig-cache
+rust/target
+rust/.idea
+csharp/bin
+csharp/obj
+csharp/wwwroot
+zig/main.wasm.tmp*

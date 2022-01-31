@@ -1,0 +1,88 @@
+﻿@page "/"
+@inject IJSRuntime JsRuntime
+
+<select @onchange="(e)=> Mode = (TestMode)(int.Parse(e.Value.ToString()))">
+    <option value="0">String</option>
+    <option value="1">Bytes</option>
+    <option value="2">Void</option>
+    <option value="3">VoidMap</option>
+</select>
+<input id="input" min="1" value="10000" type="number" @oninput="(e)=> Iterations = (int.Parse(e.Value.ToString()))">
+<button @onclick="FuncOnClick">Run</button>
+
+@code {
+    public enum TestMode { String, Bytes, Void, VoidMap }
+
+    public int Iterations = 10_000;         // Should use mutex?
+    public TestMode Mode = TestMode.String; // Should use mutex?
+
+    async private void FuncOnClick() {
+        switch (Mode) {
+        case TestMode.String:
+            _FuncOnClick_String(Iterations);
+            break;
+
+        case TestMode.Bytes:
+            _FuncOnClick_Bytes(Iterations);
+            break;
+
+        case TestMode.Void:
+            _FuncOnClick_Void(Iterations);
+            break;
+
+        case TestMode.VoidMap:
+            _FuncOnClick_VoidMap(Iterations);
+            break;
+        }
+    }
+
+    async private void _FuncOnClick_String(int iter) {
+        System.Text.StringBuilder sb = new System.Text.StringBuilder(iter);
+
+        await JsRuntime.InvokeVoidAsync("oomStart");
+
+        for (int i = 0; i < iter; i++) {
+            sb.Append("A");
+            await JsRuntime.InvokeVoidAsync("oomTestString", sb.ToString());
+        }
+
+        await JsRuntime.InvokeVoidAsync("oomEnd");
+    }
+
+    async private void _FuncOnClick_Bytes(int iter) {
+        await JsRuntime.InvokeVoidAsync("oomStart");
+
+        for (int i = 0; i < iter; i++) {
+            await JsRuntime.InvokeVoidAsync("oomTestBytes", new byte[i]);
+        }
+
+        await JsRuntime.InvokeVoidAsync("oomEnd");
+    }
+
+    async private void _FuncOnClick_Void(int iter) {
+        await JsRuntime.InvokeVoidAsync("oomStart");
+
+        for (int i = 0; i < iter; i++) {
+            await JsRuntime.InvokeVoidAsync("oomTestVoid");
+        }
+
+        await JsRuntime.InvokeVoidAsync("oomEnd");
+    }
+
+    async private void _FuncOnClick_VoidMap(int iter) {
+        Random rnd = new Random();
+        byte[] b = new byte[32 * 1024];
+
+        await JsRuntime.InvokeVoidAsync("oomStart");
+
+        for (int i = 0; i < iter; i++) {
+            rnd.NextBytes(b);
+            // @HelpWanted
+            // How do zero-copy? How cast array to string without copy?
+            // See Golang implementation (go/main_raw_js.go) as reference.
+            await JsRuntime.InvokeVoidAsync("oomTestVoidMap." + Convert.ToBase64String(b));
+        }
+
+        await JsRuntime.InvokeVoidAsync("oomEnd");
+    }
+}

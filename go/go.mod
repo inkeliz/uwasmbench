@@ -3,7 +3,7 @@ module golang
 go 1.17
 
 require (
-	gioui.org/cmd v0.0.0-20220129123816-ba732274699d // indirect
+	gioui.org/cmd v0.0.0-20220131180029-7204632c39d4 // indirect
 	github.com/akavel/rsrc v0.10.1 // indirect
 	golang.org/x/image v0.0.0-20210628002857-a66eb6448b8d // indirect
 	golang.org/x/mod v0.4.2 // indirect

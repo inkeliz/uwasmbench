@@ -1,6 +1,6 @@
 # INKWASMBench
 
-**[RUN IT ONLINE]()**
+**[RUN IT ONLINE](https://uwasmbench.pages.dev/)**
 
 That is a small benchmark to check how efficient each language can call JS functions, from their host language.
 
